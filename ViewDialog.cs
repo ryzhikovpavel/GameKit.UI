@@ -1,4 +1,5 @@
 ﻿using System;
+using GameKit;
 using GameKit.UI.Core;
 using UnityEngine;
 
@@ -15,14 +16,14 @@ namespace GameKit.UI
             }
             else
             {
-                Service.Get<UiManagementSystem>().NotifyDialogClose(this);
+                Service<UiManagementSystem>.Instance.NotifyDialogClose(this);
                 HideInternal(onDisable);
             }
         }
 
         protected void Show()
         {
-            Service.Get<UiManagementSystem>().NotifyDialogOpen(this);
+            Service<UiManagementSystem>.Instance.NotifyDialogOpen(this);
             ShowInternal();
         }
     }

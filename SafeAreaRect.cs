@@ -1,7 +1,6 @@
 ﻿using System;
 using GameKit.UI.Core;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace GameKit.UI
 {
@@ -18,11 +17,11 @@ namespace GameKit.UI
         }
 
         [SerializeField] private Direction direction;
-        private RectTransform rt;
+        private RectTransform _rectTransform;
 
         private void Awake()
         {
-            rt = (RectTransform) transform;
+            _rectTransform = (RectTransform) transform;
         }
 
         internal void Sync(Rect safeArea)
@@ -66,32 +65,32 @@ namespace GameKit.UI
                 anchorMin.y = 0;
             }
             
-            rt.anchorMin = anchorMin;
-            rt.anchorMax = anchorMax;
-            
-            Debug.Log(safeArea);
+            _rectTransform.anchorMin = anchorMin;
+            _rectTransform.anchorMax = anchorMax;
         }
         
         private void OnEnable()
         {
-            Service.Get<ProcessorSafeArea>().Subscribe(this);
+            Service<ProcessorSafeArea>.Instance.Subscribe(this);
         }
 
         private void OnDisable()
         {
-            Service.Get<ProcessorSafeArea>().Unsubscribe(this);
+            Service<ProcessorSafeArea>.Instance.Unsubscribe(this);
         }
 
         private void Reset()
         {
-            var rt = (RectTransform)transform;
-            rt.anchorMax = new Vector2(1, 1);
-            rt.anchorMin = new Vector2(0, 0);
-            rt.offsetMin = new Vector2(0, 0);
-            rt.offsetMax = new Vector2(0, 0);
+            if (transform is RectTransform rt)
+            {
+                rt.anchorMax = new Vector2(1, 1);
+                rt.anchorMin = new Vector2(0, 0);
+                rt.offsetMin = new Vector2(0, 0);
+                rt.offsetMax = new Vector2(0, 0);
+            }
 
             var canvas = GetComponent<Canvas>();
-            if (canvas.isRootCanvas)
+            if (canvas != null && canvas.isRootCanvas)
             {
                 Debug.LogError($"{nameof(SafeAreaRect)} dont work with Root Canvas");
             }

@@ -5,18 +5,18 @@ namespace GameKit.UI.Core
 {
     public class ViewBlockable: ViewComponent
     {
-        private GameObject block;
+        private GameObject _block;
 
         public override bool Interactable
         {
-            get { return block.activeSelf == false; }
+            get { return _block.activeSelf == false; }
             set
             {
-                block.SetActive(value == false);
+                _block.SetActive(value == false);
                 if (value)
-                    block.transform.SetAsFirstSibling();
+                    _block.transform.SetAsFirstSibling();
                 else
-                    block.transform.SetAsLastSibling();
+                    _block.transform.SetAsLastSibling();
             }
         }
 
@@ -24,10 +24,11 @@ namespace GameKit.UI.Core
         {
             base.Initialize();
             
-            block = new GameObject("input block");
-            block.transform.SetParent(transform);
-            block.layer = gameObject.layer;
-            var img = block.AddComponent<Image>();
+            _block = new GameObject("input block");
+            _block.transform.SetParent(transform, false);
+            _block.layer = gameObject.layer;
+            var img = _block.AddComponent<Image>();
+            img.color = new Color(0, 0, 0, 0);
             var rt = img.rectTransform;
             rt.anchorMax = new Vector2(1, 1);
             rt.anchorMin = new Vector2(0, 0);

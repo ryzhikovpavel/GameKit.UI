@@ -136,10 +136,11 @@ namespace GameKit.UI.Core
             }
             
             gameObject.AddComponent<FadeViewAnimator>();
-            
-            _canvas.overrideSorting = true;
+
+            var layer = SortingLayer.NameToID("UI");
+            _canvas.overrideSorting = layer > 0;
             _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            _canvas.sortingLayerID = SortingLayer.NameToID("UI");
+            _canvas.sortingLayerID = layer;
 
 #if UNITY_EDITOR
             while (UnityEditorInternal.ComponentUtility.MoveComponentDown(this)) {}
