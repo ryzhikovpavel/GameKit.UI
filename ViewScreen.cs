@@ -1,6 +1,4 @@
-﻿using System;
-using GameKit.Core;
-using GameKit.UI.Core;
+﻿using GameKit.UI.Implementation;
 
 namespace GameKit.UI
 {

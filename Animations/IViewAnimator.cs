@@ -1,7 +1,6 @@
 ﻿using System;
-using UnityEngine;
 
-namespace GameKit.UI.Core
+namespace GameKit.UI.Animations
 {
     public interface IViewAnimator
     {

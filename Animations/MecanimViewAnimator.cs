@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections;
-using GameKit.UI.Core;
 using UnityEngine;
 
-namespace GameKit.UI.Animators
+namespace GameKit.UI.Animations
 {
     [RequireComponent(typeof(Animator))]
     internal class MecanimViewAnimator: MonoBehaviour, IViewAnimator 

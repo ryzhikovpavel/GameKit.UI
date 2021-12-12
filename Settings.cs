@@ -1,7 +1,4 @@
-﻿using System;
-using GameKit.UI.Core;
-
-namespace GameKit.UI
+﻿namespace GameKit.UI
 {
     public class Settings
     {

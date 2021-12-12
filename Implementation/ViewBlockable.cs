@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace GameKit.UI.Core
+namespace GameKit.UI.Implementation
 {
     public class ViewBlockable: ViewComponent
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace GameKit.UI.Core
+namespace GameKit.UI.Implementation
 {
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class ProcessorSafeArea

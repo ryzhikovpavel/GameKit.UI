@@ -1,5 +1,5 @@
 ﻿using System;
-using GameKit.UI.Core;
+using GameKit.UI.Implementation;
 using UnityEngine;
 
 namespace GameKit.UI

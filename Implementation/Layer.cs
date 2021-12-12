@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace GameKit.UI.Core
+namespace GameKit.UI.Implementation
 {
-    internal class Layer
+    internal class Layer: IEnumerable<ViewComponent>
     {
         private readonly List<ViewComponent> views = new List<ViewComponent>();
         private readonly int orderBase;
@@ -45,6 +46,19 @@ namespace GameKit.UI.Core
             view.Order = orderBase - 1;
             views.Sort(OrderSort);
             Ordering();
+        }
+        
+        public void NotifySuspend()
+        {
+            foreach (var view in views)
+            {
+                view.Suspend();
+            }
+        }
+
+        public void NotifyTopResume()
+        {
+            views.Last().Resume();
         }
 
         private void Stack(ViewComponent view)
@@ -88,8 +102,18 @@ namespace GameKit.UI.Core
         private void OnViewDestroying(ViewComponent view)
         {
             Remove(view);
-            if (view is ViewShading)
+            if (view is ViewShading && Loop.IsQuitting == false)
                 Debug.LogWarning("Shading destroyed before hiding all dialogs");
+        }
+
+        public IEnumerator<ViewComponent> GetEnumerator()
+        {
+            return ((IEnumerable<ViewComponent>)views).GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return views.GetEnumerator();
         }
     }
 }

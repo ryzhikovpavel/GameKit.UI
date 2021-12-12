@@ -1,10 +1,9 @@
 ﻿#pragma warning disable 649
-using UnityEngine;
 using System;
 using System.Collections;
-using GameKit.UI.Core;
+using UnityEngine;
 
-namespace GameKit.UI.Animators
+namespace GameKit.UI.Animations
 {
     [RequireComponent(typeof(CanvasGroup))]
     internal class FadeViewAnimator : MonoBehaviour, IViewAnimator

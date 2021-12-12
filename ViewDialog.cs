@@ -1,14 +1,14 @@
 ﻿using System;
-using GameKit;
-using GameKit.UI.Core;
+using GameKit.UI.Implementation;
 using UnityEngine;
 
 namespace GameKit.UI
 {
-    public abstract class ViewDialogBlank: ViewBlockable
+    public abstract class ViewDialog: ViewBlockable
     {
-        public void Close(){ Close(null);}
-        public void Close(Action onDisable)
+        private DialogHandler _handler;
+        
+        private void Close()
         {
             if (IsDisplayed == false)
             {
@@ -16,34 +16,47 @@ namespace GameKit.UI
             }
             else
             {
-                Service<UiManagementSystem>.Instance.NotifyDialogClose(this);
-                HideInternal(onDisable);
+                HideInternal(null);
             }
         }
 
-        protected void Show()
+        protected THandler Show<THandler>(THandler handler) where THandler: DialogHandler
         {
+            _handler = handler;
             Service<UiManagementSystem>.Instance.NotifyDialogOpen(this);
             ShowInternal();
-        }
-    }
-    
-    public abstract class ViewDialog : ViewDialogBlank
-    {
-        public void Open()
-        {
-            Show();
-        }
-    }
-    
-    public abstract class ViewDialog<TParam> : ViewDialogBlank
-    {
-        public void Open(TParam param)
-        {
-            Param = param;
-            Show();
+            return handler;
         }
         
-        public TParam Param { get; private set; }
+        protected DialogHandler Show() => Show(new DialogHandler(this));
+
+        protected internal override void HideComplete()
+        {
+            if (Loop.IsQuitting == false) Service<UiManagementSystem>.Instance.NotifyDialogClose(this);
+        }
+
+        public void CloseAbort(string error)
+        {
+            Close();
+            ((IDialogHandlerCommand)_handler).Abort(error);
+        }
+
+        public void CloseCancel()
+        {
+            Close();
+            ((IDialogHandlerCommand)_handler).Cancel();
+        }
+
+        protected void CloseComplete()
+        {
+            Close();
+            ((IDialogHandlerCommand)_handler).Complete();
+        }
+    }
+
+    public abstract class ViewDialog<TResult> : ViewDialog, IDialogResult<TResult>
+    {
+        public TResult Result { get; protected set; }
+        protected new DialogHandler<TResult> Show() => Show(new DialogHandler<TResult>(this, this));
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
-using GameKit.UI.Core;
 
-namespace GameKit.UI.Animators
+namespace GameKit.UI.Animations
 {
     internal class DummyViewAnimator: IViewAnimator
     {

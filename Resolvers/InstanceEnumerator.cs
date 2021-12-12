@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using GameKit.UI.Implementation;
 
-namespace GameKit.UI.Core
+namespace GameKit.UI.Resolvers
 {
     public class InstanceEnumerator: IEnumerator<ViewComponent>
     {

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using GameKit.UI.Implementation;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace GameKit.UI.Core
+namespace GameKit.UI.Resolvers
 {
     public class SingletonViewResolver : PrefabViewResolver, IViewResolver, IDisposable
     {
@@ -25,6 +26,7 @@ namespace GameKit.UI.Core
 
         public void Release(ViewComponent view)
         {
+            view.HideObject();
             if (_instance == null)
                 _instance = view;
         }

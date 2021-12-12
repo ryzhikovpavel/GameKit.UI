@@ -1,9 +1,7 @@
-﻿using GameKit.UI.Animators;
-using UnityEngine;
-using UnityEngine.SceneManagement;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace GameKit.UI.Core
+namespace GameKit.UI.Implementation
 {
     [RequireComponent(typeof(Canvas))]
     public class ViewShading : ViewComponent

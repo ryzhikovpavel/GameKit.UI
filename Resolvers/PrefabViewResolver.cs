@@ -1,8 +1,9 @@
 ﻿using System;
+using GameKit.UI.Implementation;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace GameKit.UI.Core
+namespace GameKit.UI.Resolvers
 {
     public class PrefabViewResolver
     {

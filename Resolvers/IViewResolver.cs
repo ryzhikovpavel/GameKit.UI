@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using GameKit.Pooling;
+using GameKit.UI.Implementation;
 
-namespace GameKit.UI.Core
+namespace GameKit.UI.Resolvers
 {
     public interface IViewResolver: IEnumerable<ViewComponent>
     {

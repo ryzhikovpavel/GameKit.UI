@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameKit.Core;
-using GameKit.UI.Core;
-using GameKit.Pooling;
+using GameKit.UI.Implementation;
+using GameKit.UI.Resolvers;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -40,6 +39,9 @@ namespace GameKit.UI
 
         internal void NotifyDialogOpen(ViewComponent dialog)
         {
+            screenLayer.NotifySuspend();
+            dialogLayer.NotifySuspend();
+            
             if (dialogLayer.Count == 0)
             {
                 if (shading == null)
@@ -60,14 +62,16 @@ namespace GameKit.UI
             {
                 shading.HideInternal();
                 dialogLayer.Remove(shading);
+                screenLayer.NotifyTopResume();
             }
-        }
+            else
+            {
+                dialogLayer.NotifyTopResume();
+            }
 
-        internal void TransitionToLastScreen()
-        {
-            
+            resolvers[dialog.GetType()].Release(dialog);
         }
-
+        
         public void TransitionTo<TScreen>() where TScreen : ViewScreen
         {
             TransitionTo<TScreen>(Settings.Transition);
@@ -109,7 +113,7 @@ namespace GameKit.UI
             activeScreen = screen;
         }
         
-        public TDialog Create<TDialog>() where TDialog: ViewDialogBlank
+        public TDialog Create<TDialog>() where TDialog: ViewDialog
         {
             var view = (TDialog) Resolve(typeof(TDialog));
             return view;
@@ -121,22 +125,22 @@ namespace GameKit.UI
             {
                 foreach (var view in resolver)
                 {
-                    if (view is ViewDialogBlank d && view.IsDisplayed)
+                    if (view is ViewDialog d && view.IsDisplayed && view.State != ViewState.Hiding)
                     {
-                        d.Close();
+                        d.CloseCancel();
                     }
                 }
             }
         }
 
-        public void CloseDialogs<TDialog>() where TDialog: ViewDialogBlank
+        public void CloseDialogs<TDialog>() where TDialog: ViewDialog
         {
             if (resolvers.TryGetValue(typeof(TDialog), out var resolver))
             {
                 // ReSharper disable once PossibleInvalidCastExceptionInForeachLoop
-                foreach (ViewDialogBlank view in resolver)
+                foreach (ViewDialog view in resolver)
                 {
-                    if (view.IsDisplayed) view.Close();
+                    if (view.IsDisplayed && view.State != ViewState.Hiding) view.CloseCancel();
                 }
             }
         }
@@ -226,7 +230,7 @@ namespace GameKit.UI
         private IViewResolver CreateResolverFor(Type type)
         {
             if (typeof(ViewScreen).IsAssignableFrom(type)) return new SingletonViewResolver(GetPath(type));
-            if (typeof(ViewDialogBlank).IsAssignableFrom(type)) return new PoolViewResolver(GetPath(type));
+            if (typeof(ViewDialog).IsAssignableFrom(type)) return new PoolViewResolver(GetPath(type));
             if (type == typeof(ViewShading)) return new ShadowViewResolver(GetPath(type));
             throw new Exception($"Cannot create resolver for {type.Name}");
         }

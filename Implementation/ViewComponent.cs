@@ -1,22 +1,26 @@
 ﻿using System;
 using System.Collections;
+using GameKit.UI.Animations;
 using UnityEngine;
-using GameKit.UI.Animators;
 using UnityEngine.UI;
 
-namespace GameKit.UI.Core
+namespace GameKit.UI.Implementation
 {
     [RequireComponent(typeof(Canvas))]
     [RequireComponent(typeof(GraphicRaycaster))]
     public abstract class ViewComponent : MonoBehaviour
     {
+        [SerializeField] private bool autoHideOnSuspend;
+        
         public event Action<ViewComponent> EventDestroy = delegate {};
         
-        public bool IsDisplayed => gameObject.activeSelf;
+        public bool IsDisplayed => gameObject.activeSelf && _canvas.enabled;
         public bool IsTransition => Animator.IsPlaying;
+        public ViewState State { get; private set; }
         
         public IViewAnimator Animator { get; private set; }
         public virtual bool Interactable { get; set; }
+        
 
         internal int Order
         {
@@ -32,6 +36,7 @@ namespace GameKit.UI.Core
         {
             gameObject.SetActive(true);
             Interactable = false;
+            State = ViewState.Showing;
             Animator.PlayShow(onComplete, ShowComplete);
         }
 
@@ -44,14 +49,33 @@ namespace GameKit.UI.Core
                 onComplete?.Invoke();
                 return;
             }
-            
+         
+            State = ViewState.Hiding;
             Interactable = false;
             OnHide();
             Animator.PlayHide(onComplete, HideComplete);
         }
 
+        internal void Suspend()
+        {
+            if (autoHideOnSuspend) _canvas.enabled = false;
+            OnSuspend();
+            State = ViewState.Suspended;
+        }
+
+        internal void Resume()
+        {
+            if (autoHideOnSuspend) _canvas.enabled = true;
+            OnResume();
+            State = ViewState.Displayed;
+        }
+
         protected virtual void OnDisplayed() { }
         protected virtual void OnHide() { }
+        
+        protected virtual void OnSuspend() { }
+        protected virtual void OnResume() { }
+
 
         private void OnDestroy()
         {
@@ -61,12 +85,14 @@ namespace GameKit.UI.Core
         private void ShowComplete()
         {
             Interactable = true;
+            State = ViewState.Displayed;
             OnDisplayed();
         }
-        
-        private void HideComplete()
+
+        protected internal virtual void HideComplete()
         {
             Interactable = true;
+            State = ViewState.Disabled;
             gameObject.SetActive(false);
         }
         
@@ -133,13 +159,14 @@ namespace GameKit.UI.Core
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+                
+                _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             }
             
             gameObject.AddComponent<FadeViewAnimator>();
 
             var layer = SortingLayer.NameToID("UI");
-            _canvas.overrideSorting = layer > 0;
-            _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            _canvas.overrideSorting = SortingLayer.IsValid(layer);
             _canvas.sortingLayerID = layer;
 
 #if UNITY_EDITOR

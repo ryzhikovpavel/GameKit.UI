@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using GameKit.UI.Implementation;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace GameKit.UI.Core
+namespace GameKit.UI.Resolvers
 {
     public class PoolViewResolver : PrefabViewResolver, IViewResolver, IDisposable
     {
@@ -79,7 +80,27 @@ namespace GameKit.UI.Core
                     return item.Instance;
                 }
             }
+            
+            return AddIssuedInstance(CreateInstance()).Instance;
+        }
 
+        public void Release(ViewComponent view)
+        {
+            view.HideObject();
+            foreach (var item in items)
+            {
+                if (item.Instance == view)
+                {
+                    item.State = State.Pooled;
+                    return;
+                }
+            }
+            
+            AddIssuedInstance(view).State = State.Pooled;
+        }
+
+        private PoolItem AddIssuedInstance(ViewComponent instance)
+        {
             PoolItem e = null;
             foreach (var item in items)
             {
@@ -95,28 +116,13 @@ namespace GameKit.UI.Core
                 e = new PoolItem();
                 items.Add(e);
             }
-            
-            e.Instance = CreateInstance();
+
+            e.Instance = instance;
             e.Instance.EventDestroy += e.OnDestroy;
             e.State = State.Issued;
-            
-            return e.Instance;
+            return e;
         }
-
-        public void Release(ViewComponent view)
-        {
-            foreach (var item in items)
-            {
-                if (item.Instance == view)
-                {
-                    item.State = State.Pooled;
-                    return;
-                }
-            }
-            
-            Debug.LogWarning($"View {view.name} not contain in pool resolver");
-        }
-
+        
         public void Dispose()
         {
             foreach (var item in items)
