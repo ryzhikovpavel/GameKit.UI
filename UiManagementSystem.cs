@@ -72,14 +72,17 @@ namespace GameKit.UI
             resolvers[dialog.GetType()].Release(dialog);
         }
         
-        public void TransitionTo<TScreen>() where TScreen : ViewScreen
+        public TransitionHandler<TScreen> TransitionTo<TScreen>() where TScreen : ViewScreen
         {
-            TransitionTo<TScreen>(Settings.Transition);
+            return TransitionTo<TScreen>(Settings.Transition);
         }
 
-        public void TransitionTo<TScreen>(Transition transition) where TScreen : ViewScreen
+        public TransitionHandler<TScreen> TransitionTo<TScreen>(Transition transition) where TScreen : ViewScreen
         {
-            TransitionTo((TScreen) Resolve(typeof(TScreen)), transition);
+            var transitionHandler = new TransitionHandler<TScreen>();
+            transitionHandler.SetView((TScreen) Resolve(typeof(TScreen)));
+            TransitionTo(transitionHandler.View, transition);
+            return transitionHandler;
         }
         
         public void TransitionTo(ViewScreen screen, Transition transition)

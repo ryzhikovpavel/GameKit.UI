@@ -53,8 +53,8 @@ namespace GameKit.UI
             ((IDialogHandlerCommand)_handler).Complete();
         }
     }
-
-    public abstract class ViewDialog<TResult> : ViewDialog, IDialogResult<TResult>
+    
+    public abstract class ViewDialogWithResult<TResult> : ViewDialog, IDialogResult<TResult>
     {
         public TResult Result { get; protected set; }
         protected new DialogHandler<TResult> Show() => Show(new DialogHandler<TResult>(this, this));

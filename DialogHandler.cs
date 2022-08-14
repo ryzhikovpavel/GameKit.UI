@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using GameKit.UI.Implementation;
 using UnityEngine;
 
 namespace GameKit.UI
@@ -16,21 +17,23 @@ namespace GameKit.UI
         T Result { get; }
     }
     
-    public class DialogHandler: CustomYieldInstruction, IDialogHandlerCommand
+    public class DialogHandler: TransitionHandler<ViewDialog>, IDialogHandlerCommand
     {
         public event Action EventCompleted;
         
-        public ViewDialog Dialog { get; private set; }
         public string Error { get; protected set; }
         public bool IsCanceled { get; private set; }
         public bool IsFaulted { get; private set; }
         public bool IsCompleted { get; private set; }
-        public bool IsTransition => Dialog is null ? false : Dialog.IsTransition;
-        
         public bool IsCompletedSuccessfully => IsCompleted && !IsFaulted;
         public bool SkipAnimation { get; set; } = false;
-        
-        public override bool keepWaiting => !(IsCompleted && (SkipAnimation || !IsTransition) );
+
+        protected override bool KeepWaiting => !(IsCompleted && (SkipAnimation || !IsTransition) );
+
+        public DialogHandler(ViewDialog view)
+        {
+            SetView(view);
+        }
         
         void IDialogHandlerCommand.Abort(string error)
         {
@@ -50,15 +53,10 @@ namespace GameKit.UI
             IsCompleted = true;
             DoComplete();
         }
-        public DialogHandler(ViewDialog dialog)
-        {
-            Dialog = dialog;
-        }
 
         protected virtual void DoComplete()
         {
             EventCompleted?.Invoke();
-            Dialog = null;
         }
     }
     
