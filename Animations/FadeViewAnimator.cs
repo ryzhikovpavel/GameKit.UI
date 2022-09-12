@@ -15,25 +15,25 @@ namespace GameKit.UI.Animations
             Out = 2
         }
         
-        [Range(0.1f, 5f), SerializeField] private float duration = 0.33f;
+        [Range(0.1f, 5f), SerializeField] private float duration = 0.15f;
         [SerializeField] private Direction direction = Direction.In | Direction.Out;
-        private CanvasGroup transparent;
-        private Coroutine routine;
+        private CanvasGroup _transparent;
+        private Coroutine _routine;
 
-        public bool IsPlaying => routine != null;
+        public bool IsPlaying => _routine != null;
 
         public void PlayShow(Action onReady, Action onComplete)
         {
-            if (routine != null)
+            if (_routine != null)
             {
                 Debug.LogWarning($"{gameObject.name} replace animation on Show. Completion events from past animation will not be dispatched");
-                StopCoroutine(routine);
+                StopCoroutine(_routine);
             }
             if (direction.HasFlag(Direction.In))
-                routine = StartCoroutine(Fade(1, onReady, onComplete));
+                _routine = StartCoroutine(Fade(1, onReady, onComplete));
             else
             {
-                transparent.alpha = 1;
+                _transparent.alpha = 1;
                 onReady?.Invoke();
                 onComplete?.Invoke();
             }
@@ -41,17 +41,17 @@ namespace GameKit.UI.Animations
 
         public void PlayHide(Action onReady, Action onComplete)
         {
-            if (routine != null)
+            if (_routine != null)
             {
                 Debug.LogWarning($"{gameObject.name} replace animation on Hide. Completion events from past animation will not be dispatched");
-                StopCoroutine(routine);
+                StopCoroutine(_routine);
             }
 
             if (direction.HasFlag(Direction.Out))
-                routine = StartCoroutine(Fade(0, onReady, onComplete));
+                _routine = StartCoroutine(Fade(0, onReady, onComplete));
             else
             {
-                transparent.alpha = 0;
+                _transparent.alpha = 0;
                 onReady?.Invoke();
                 onComplete?.Invoke();
             }
@@ -59,13 +59,14 @@ namespace GameKit.UI.Animations
 
         private void Awake()
         {
-            transparent = GetComponent<CanvasGroup>();
-            transparent.alpha = 0;
+            _transparent = GetComponent<CanvasGroup>();
+            _transparent.alpha = 0;
         }
 
         private void OnDisable()
         {
-            if (routine != null) StopCoroutine(routine);
+            if (_routine != null) StopCoroutine(_routine);
+            _routine = null;
         }
 
         private IEnumerator Fade(int target, Action onReady, Action onComplete)
@@ -74,15 +75,15 @@ namespace GameKit.UI.Animations
             
             int dir = target == 0 ? -1 : 1;
 
-            while (transparent.alpha.Equals(target) == false)
+            while (_transparent.alpha.Equals(target) == false)
             {
-                transparent.alpha = Mathf.Clamp01(transparent.alpha + dir * Time.unscaledDeltaTime / duration);
+                _transparent.alpha = Mathf.Clamp01(_transparent.alpha + dir * Time.unscaledDeltaTime / duration);
                 yield return null;
             }
             onReady?.Invoke();
             yield return null;
+            _routine = null;
             onComplete?.Invoke();
-            routine = null;
         }
     }
 }

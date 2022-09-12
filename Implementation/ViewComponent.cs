@@ -37,6 +37,7 @@ namespace GameKit.UI.Implementation
             gameObject.SetActive(true);
             Interactable = false;
             State = ViewState.Showing;
+            OnActivated();
             Animator.PlayShow(onComplete, ShowComplete);
         }
 
@@ -70,6 +71,9 @@ namespace GameKit.UI.Implementation
             State = ViewState.Displayed;
         }
 
+        protected virtual void OnActivated() { }
+        protected virtual void OnDeactivated() { }
+        
         protected virtual void OnDisplayed() { }
         protected virtual void OnHide() { }
         
@@ -93,6 +97,7 @@ namespace GameKit.UI.Implementation
         {
             Interactable = true;
             State = ViewState.Disabled;
+            OnDeactivated();
             gameObject.SetActive(false);
         }
         

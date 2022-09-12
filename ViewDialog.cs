@@ -35,6 +35,12 @@ namespace GameKit.UI
             if (Loop.IsQuitting == false) Service<UiManagementSystem>.Instance.NotifyDialogClose(this);
         }
 
+        private void OnDisable()
+        {
+            if (State is ViewState.Displayed or ViewState.Showing or ViewState.Suspended) 
+                CloseAbort($"{name} view disable");
+        }
+
         public void CloseAbort(string error)
         {
             Close();

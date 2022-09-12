@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Runtime.CompilerServices;
 using GameKit.UI.Implementation;
 using UnityEngine;
 
