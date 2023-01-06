@@ -141,31 +141,8 @@ namespace GameKit.UI.Implementation
 
             if (_canvas.isRootCanvas)
             {
-                var scaler = gameObject.AddComponent<CanvasScaler>();
-                scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-                scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-
-                switch (Screen.orientation)
-                {
-                    case ScreenOrientation.Portrait:
-                    case ScreenOrientation.PortraitUpsideDown:
-                        scaler.referenceResolution = new Vector2(1024, 2048);
-                        scaler.matchWidthOrHeight = 1;
-                        break;
-                    case ScreenOrientation.LandscapeLeft:
-                    case ScreenOrientation.LandscapeRight:
-                        scaler.referenceResolution = new Vector2(2048, 1024);
-                        scaler.matchWidthOrHeight = 1;
-                        break;
-                    case ScreenOrientation.AutoRotation:
-                        scaler.referenceResolution = new Vector2(2048, 1024);
-                        scaler.matchWidthOrHeight = 0.5f;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-                
-                _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                AddScalerIfNotExist();
+                _canvas.renderMode = RenderMode.ScreenSpaceOverlay;   
             }
             
             gameObject.AddComponent<FadeViewAnimator>();
@@ -177,6 +154,34 @@ namespace GameKit.UI.Implementation
 #if UNITY_EDITOR
             while (UnityEditorInternal.ComponentUtility.MoveComponentDown(this)) {}
 #endif
+        }
+
+        private void AddScalerIfNotExist()
+        {
+            if (gameObject.GetComponent<CanvasScaler>() != null) return; 
+            var scaler = gameObject.AddComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+
+            switch (Screen.orientation)
+            {
+                case ScreenOrientation.Portrait:
+                case ScreenOrientation.PortraitUpsideDown:
+                    scaler.referenceResolution = new Vector2(1024, 2048);
+                    scaler.matchWidthOrHeight = 1;
+                    break;
+                case ScreenOrientation.LandscapeLeft:
+                case ScreenOrientation.LandscapeRight:
+                    scaler.referenceResolution = new Vector2(2048, 1024);
+                    scaler.matchWidthOrHeight = 1;
+                    break;
+                case ScreenOrientation.AutoRotation:
+                    scaler.referenceResolution = new Vector2(2048, 1024);
+                    scaler.matchWidthOrHeight = 0.5f;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
     }
 }
